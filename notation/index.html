@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./style.css">
+        <title>识谱速度训练</title>
+    </head>
+    <body>
+    <p id="statistic">statistics here</p>
+    <div id="boo"></div>
+    <div class="progressbar"></div>
+    <div class="select"><div>do</div><div>re</div><div>mi</div><div>fa</div><div>sol</div><div>la</div><div>si</div></div>
+    <script src="/js/jquery-1.11.2.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="./vexflow-min.js"></script>
+    <script type="text/javascript">
+    var st=new Date().getTime(),notepermin=0,ac=0,tot=0;
+    function updatestatistic(y)
+    {
+        if (y==true)
+        {
+            ac++;
+            notepermin=ac*1000*60/(new Date().getTime()-st);
+        }
+        tot++;
+        $("#statistic").html('Note/min: '+notepermin.toFixed(1)+', Correct: '+ac+', Total: '+tot+', Accuracy: '+(ac/tot*100).toFixed(1)+'%');
+    }
+var n=4;
+var keytable =new Array(
+    "a/0","b/0",
+    "c/1","d/1","e/1","f/1","g/1","a/1","b/1",
+    "c/2","d/2","e/2","f/2","g/2","a/2","b/2",
+    "c/3","d/3","e/3","f/3","g/3","a/3","b/3",
+    "c/4","d/4","e/4","f/4","g/4","a/4","b/4",
+    "c/5","d/5","e/5","f/5","g/5","a/5","b/5",
+    "c/6","d/6","e/6","f/6","g/6","a/6","b/6",
+    "c/7","d/7","e/7","f/7","g/7","a/7","b/7",
+    "c/8"
+    );
+var nametable=new Array(
+    "la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do","re","mi","fa","sol","la","si",
+    "do"
+);
+var key=new Array();
+var kname=new Array();
+var clef="";
+function rand(l,r)
+{
+    return Math.floor(Math.random()*(r-l+1))%(r-l+1)+l;
+}
+function randkeys()
+{
+    if (rand(0,1)==1) clef="treble";
+    else clef="bass";
+// f/3 -> e/6
+// a/1 -> g/4
+    var l,r;
+    if (clef=="treble") l=19,r=39;
+    else l=7,r=27;
+    for (i=0;i<n;i++)
+    {
+        var x=rand(l,r);
+        key[i]=keytable[x];
+        kname[i]=nametable[x];
+    }
+}
+function draw(myclef)
+{
+    $("#boo").html("");
+    VF = Vex.Flow;
+    // Create an SVG renderer and attach it to the DIV element named "boo".
+    var div = document.getElementById("boo")
+    var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+    // Size our svg:
+    renderer.resize(300, 120);
+    // And get a drawing context:
+    var context = renderer.getContext();
+    // Create a stave at position 10, 40 of width 400 on the canvas.
+    var stave = new VF.Stave(50, 0, 2333);
+    // Add a clef and time signature.
+    stave.addClef(myclef).addTimeSignature(n+"/4");
+    // Connect it to the rendering context and draw!
+    stave.setContext(context).draw();
+    //====================================================================================
+    var notes = new Array();
+    for (i=0;i<n;i++)
+        notes[i]=new VF.StaveNote({clef: myclef, keys: [key[i]], duration: "q" , auto_stem: true });
+    //console.log(notes);
+    //====================================================================================
+    // Create a voice in 4/4 and add above notes
+    var voice = new VF.Voice({num_beats: n,  beat_value: 4});
+    voice.addTickables(notes);
+    // Format and justify the notes to 400 pixels.
+    var formatter = new VF.Formatter().joinVoices([voice]).format([voice], 150);
+    // Render voice
+    voice.draw(context, stave);
+}
+function drawdiv()
+{
+    var s="";
+    for (i=1;i<=n;i++) s+="<div>"+i+"</div>";
+    $(".progressbar").html(s);
+}
+function chgcolorall(obj,type)
+{
+    for (var i=0;i<obj.length;i++)
+        $(obj[i]).attr("class", "alert alert-"+type);
+}
+function chgcolorn(obj,n,type)
+{
+    $(obj[n]).attr("class", "alert alert-"+type);
+}
+function chgcolor(obj,type)
+{
+    $(obj).attr("class", "alert alert-"+type);
+}
+var cnt=0;
+function init()
+{
+    $(".select div").attr("onclick","solve(this)");
+    cnt=0;
+    randkeys();
+    draw(clef);
+    drawdiv();
+    chgcolorall($(".progressbar div"),'info');
+    chgcolorall($(".select div"),'info');
+}
+var tmp;
+function solve(obj)
+{
+    //console.log($(obj).html());
+    //console.log(kname[cnt]);
+    //console.log(cnt);
+    if ($(obj).html()==kname[cnt])
+    {
+        //console.log("hello");
+        chgcolorn($(".progressbar div"),cnt,'success');
+        //console.log($(obj));
+        //console.log($($(".progressbar div")[cnt]));
+        $($(".progressbar div")[cnt]).html(kname[cnt]);
+        chgcolor(obj,'success');
+        tmp=obj;
+        setTimeout("chgcolor(tmp,'info')","200");
+        cnt++;
+        updatestatistic(true);
+    }
+    else
+    {
+        chgcolorn($(".progressbar div"),cnt,'danger');
+        chgcolor(obj,'danger');
+        tmp=obj;
+        setTimeout("chgcolor(tmp,'info')","100");
+        updatestatistic(false);
+    }
+    if (cnt==n) setTimeout("init(n)","200");
+}
+
+init();
+
+    </script>
+    </body>
+</html>
