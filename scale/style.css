@@ -1,0 +1,53 @@
+body {
+    text-align: center;
+}
+
+@media print {
+    .noprint {
+        display: none;
+    }
+    .nextpage {
+        page-break-after: always;
+    }
+    .alert-info {
+        background-color: #d9edf7 !important;
+    }
+    .alert-info * {
+        color: #31708f !important;
+    }
+    .alert-success {
+        background-color: #dff0d8 !important;
+    }
+    .alert-success * {
+        color: #3c763d !important;
+    }
+}
+
+.strong {
+    font-weight: bold;
+}
+
+.big {
+    font-size: 20px;
+}
+
+h1 {
+    margin-bottom: 30px;
+}
+
+.pianosvg p {
+    display: inline;
+}
+
+.pianosvg {
+    float: left;
+    margin: 13px 18px 13px 18px;
+}
+
+.clear {
+    clear: both;
+}
+
+#header div {
+    margin-top: 20px;
+}

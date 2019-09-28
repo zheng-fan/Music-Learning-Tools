@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./style.css">
+        <title>音阶可视化手册</title>
+    </head>
+    <body>
+        <div id="header">
+            <div class="alert alert-info">
+                <h1>音阶可视化手册</h1>
+                <p>主要包括音阶、主三和弦琶音、属七和弦、减七和弦等在钢琴上键位的可视化表示</p>
+            </div>
+            <img src="../Circle_of_fifths_deluxe_4.svg" />
+        </div>
+        <div id="control" class="noprint">
+            <div class="alert alert-warning">
+                <p class="strong">支持自然大调、和声小调，其他可能支持不完全！</p>
+                <p>注意：设置部分会在打印时自动隐藏！ & 建议使用Chrome浏览器，其他浏览器在打印时可通过调整页边距和缩放比例使页面更加协调</p>
+                <p class="strong">调号可以使用大写字母/小写字母+升降号♯/♭+类型，大写字母为大调、小写字母为小调，升降号可以用Unicode字符♯和♭，也可以使用#和b，类型1为自然、2为和声、3为旋律</p>
+                <div id="switch">
+                    <!-- <div class="checkbox">
+                        <label>
+                            <input type="checkbox" checked="checked" id="showminordom7th">显示和声小调的属七和弦
+                        </label>
+                    </div> -->
+                    <div class="form-group">
+                        <label for="keysignature">调号：</label>
+                        <input type="text" class="form-control" id="keysignature" value="C1, a2, G1, e2, D1, b2, A1, f#2, E1, c#2, B1, g#2, F1, d2, Bb1, g2, Eb1, c2, Ab1, f2, Db1, bb2, Gb1, eb2" placeholder="请输入调号，用英文逗号隔开">
+                    </div>
+                </div>
+                <div id="button">
+                    <button type="button" class="btn btn-primary" onclick="regenerate()">重新生成</button>
+                </div>
+            </div>
+        </div>
+        <div id="info" class="nextpage">
+            <img src="PianoKeyboard.svg" />
+            <div class="alert alert-success">
+                <p class="big">fanzheng.org</p>
+                <p class="big" id="date"></p>
+            </div>
+        </div>
+        <div id="content"></div>
+    <script src="/js/jquery-1.11.2.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var d=new Date;
+        $("#date").html(d.toString().match(/\w+ \w+ \d{2} \d{4}/g));
+function regenerate()
+{
+        //==============data==============
+//var colordef={1:"#449D44",2:"#EC971F"};85CBED CE7D11 743481
+var colordef={1:"#F0AD4E",2:"#d9534f",3:"#5bc0de",4:"#428bca",5:"#5cb85c",6:"#743481"};
+var data= {
+    a : [
+            {
+                "name":"大调",
+                "type":
+                [
+                    //do,re,mi,fa,sol,la,si,do
+                    // 0, 2, 4, 5,  7, 9,11,12
+                    //{"name": "音阶", "step": [0,2,4,5,7,9,11,12], "color": [1,1,1,1,1,1,1,1]},
+                    {"name": "音阶 & 终止式左手", "step": [0,2,4,5,7,9,11,12], "color": [2,1,1,2,2,1,1,1]},
+                    //do fa sol sol_ do
+                    //{"name": "终止式左手", "step": [0,5,7], "color": [2,2,2]},
+                    //re la do
+                    {"name": "终止式右手-1", "step": [2,9,12], "color": [3,3,3]},
+                    //mi sol do
+                    {"name": "终止式右手-2", "step": [4,7,12], "color": [3,3,3]},
+                    //re fa sol si
+                    {"name": "终止式右手-3", "step": [2,5,7,11], "color": [3,3,3,3]},
+                    //do mi sol do
+                    {"name": "终止式右手-4 & 主三和弦琶音", "step": [0,4,7,12], "color": [4,4,4,4]},
+                    //sol si re fa
+                    {"name": "属七和弦", "step": [7,11,14,17,19], "color": [5,5,5,5,5]}
+                ]
+            },
+            {
+                "name":"和声大调", //unused
+                "type": []
+            },
+            {
+                "name":"旋律大调", //unused
+                "type": []
+            },
+            {
+                "name":"自然小调",
+                "type":
+                [
+                    {"name": "音阶", "step": [0,2,3,5,7,8,10,12], "color": [1,1,1,1,1,1,1,1]},
+                ]
+            },
+            {
+                "name":"和声小调",
+                "type":
+                [
+                    //{"name": "音阶", "step": [0,2,3,5,7,8,11,12], "color": [1,1,1,1,1,1,1,1]},
+                    {"name": "音阶 & 终止式左手", "step": [0,2,3,5,7,8,11,12], "color": [2,1,1,2,2,1,1,1]},
+                    //{"name": "终止式左手", "step": [0,5,7], "color": [2,2,2]},
+                    {"name": "终止式右手-1", "step": [2,8,12], "color": [3,3,3]},
+                    {"name": "终止式右手-2", "step": [3,7,12], "color": [3,3,3]},
+                    {"name": "终止式右手-3", "step": [2,5,7,11], "color": [3,3,3,3]},
+                    {"name": "终止式右手-4 & 主三和弦琶音", "step": [0,3,7,12], "color": [4,4,4,4]},
+                    //{"name": "属七和弦", "step": [7,11,14,17,19], "color": [5,5,5,5,5]}
+                    {"name": "减七和弦", "step": [11,14,17,20,23], "color": [6,6,6,6,6]}
+                ]
+            },
+            {
+                "name":"旋律小调",
+                "type":
+                [
+                    {"name": "音阶", "step": [0,2,3,5,7,9,11,12,8,10], "color": [1,1,1,1,1,1,1,1,6,6]},
+                ]
+            },
+    ]
+};
+//        if ($("#showminordom7th").is(':checked')==false)
+//            data.a[4].type.pop();
+        function log(t) {
+            console.log(t);
+        }
+        function showsvg(base,step,color,name)
+        {
+            var svgtop='\
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>\
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\
+<svg width="322" height="120" version="1.1"\
+xmlns="http://www.w3.org/2000/svg">\
+';
+            var svgbottom='</svg>';
+            var svgarr=new Array(
+'<rect style="fill:white;stroke:black" x=  "0"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x= "14.33333" y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x= "23"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x= "41.66666" y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x= "46"       y="0" width="23" height="120" />',
+'<rect style="fill:white;stroke:black" x= "69"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x= "82.25"    y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x= "92"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="108.25"    y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="115"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="134.75"    y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="138"       y="0" width="23" height="120" />',
+'<rect style="fill:white;stroke:gray" x="161"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="175.33333" y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="184"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="202.66666" y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="207"       y="0" width="23" height="120" />',
+'<rect style="fill:white;stroke:black" x="230"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="243.25"    y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="253"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="269.25"    y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="276"       y="0" width="23" height="120" />',
+'<rect style="fill:black;stroke:black" x="295.75"    y="0" width="13" height="80"  />',
+'<rect style="fill:white;stroke:black" x="299"       y="0" width="23" height="120" />',
+            );
+            var back=0;
+            if (base+step[0]>=12&&(name=='属七和弦'||name=='减七和弦')) back+=12;
+            for (var i in step) svgarr[base+step[i]-back]=svgarr[base+step[i]-back].replace(/fill:(\w{5});/g,"fill:"+colordef[color[i]]+";");
+            var order=new Array(0,2,4,5,7,9,11,12,14,16,17,19,21,23,1,3,6,8,10,13,15,18,20,22);
+            var svgkey="";
+            for (var i in order) svgkey+=svgarr[order[i]];
+            return svgtop+svgkey+svgbottom;
+        }
+        var startkey={"C":0,"B#":0,"C#":1,"Db":1,"D":2,"D#":3,"Eb":3,"E":4,"Fb":4,"F":5,"E#":5,"F#":6,"Gb":6,"G":7,"G#":8,"Ab":8,"A":9,"A#":10,"Bb":10,"B":11,"Cb":11};
+        //Let's roll!
+        var keysignature=$("#keysignature").val().replace(/(\w)♯/g,"$1#").replace(/(\w)♭/g,"$1b").split(",");
+        var s="";
+        for (var i in keysignature)
+        {
+            keysignature[i]=$.trim(keysignature[i]);
+            var keyname=keysignature[i];
+            var t=keyname.match(/\d/g)-1;
+            if (keyname.charAt(0)<='z'&&keyname.charAt(0)>='a') {t+=3; keyname=keyname.charAt(0).toUpperCase()+keyname.slice(1); }
+            var stkey=startkey[keyname.match(/([^0-9]*)/g)[0]];
+            s+='<div class="keysignature">';
+            for (var j in data.a[t].type)
+            {
+                var showkeyname=keysignature[i].match(/([^0-9]*)/g)[0].replace(/(\w)#/g,"$1♯").replace(/(\w)b/g,"$1♭");
+                s+='<div class="pianosvg">'+'<p>'+showkeyname+data.a[t].name+' '+data.a[t].type[j].name+'</p><br />'+showsvg(stkey,data.a[t].type[j].step,data.a[t].type[j].color,data.a[t].type[j].name)+'</div>';
+            }
+            s+='<div class="clear"></div></div>';
+        }
+        $("#content").html(s);
+}
+        regenerate();
+    </script>
+    </body>
+</html>
